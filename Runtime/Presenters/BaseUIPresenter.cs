@@ -6,7 +6,7 @@ using MellifluousUI.Core.Views;
 
 namespace MellifluousUI.Core.Presenters
 {
-    public abstract class BaseUIPresenter<TView> : IUIPresenter<TView> where TView : BaseUIView
+    public abstract class BaseUIPresenter<TView> : IUIPresenter<TView>, IDisposable where TView : BaseUIView
     {
         public event Action ShowEventHandler;
         public event Action<ViewId> HideEventHandler;
@@ -40,10 +40,16 @@ namespace MellifluousUI.Core.Presenters
         {
             OnHideStarted();
             
-            _view.Hide(OnHideEnded);
+            _view.Hide(() =>
+            {
+                OnHideEnded();
+                Dispose();
+            });
             
             HideEventHandler?.Invoke(_view.ViewId);
         }
+        
+        public virtual void Dispose(){}
 
         public virtual void Discard(){}
 
