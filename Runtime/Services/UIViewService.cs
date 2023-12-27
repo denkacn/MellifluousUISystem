@@ -12,6 +12,8 @@ namespace MellifluousUI.Core.Services
     public class UIViewService : IUIViewService 
     {
         private List<IUIPresenter<BaseUIView>> _presenters;
+        private IUIViewComparator _comparator = new UIViewComparator();
+        
         //private Stack<IUIPresenter<BaseUIView>> _opened;
         //private IUIPresenter<BaseUIView> _current;
 
@@ -36,10 +38,15 @@ namespace MellifluousUI.Core.Services
                 AddView(view);
             }
         }
+
+        public void SetComparator(IUIViewComparator comparator)
+        {
+            _comparator = comparator;
+        }
         
         public void AddView(BaseUIView view)
         {
-            var presenter = UIViewComparator.CompareT(view);
+            var presenter = _comparator.CompareT(view);
             presenter.HideEventHandler += OnHideView;
             presenter.Init(view, this);
                 
