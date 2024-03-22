@@ -14,7 +14,7 @@ namespace MellifluousUI.Core.Presenters
         TView View { get; }
         void Init(BaseUIView view, IUIViewService viewService);
         void Show(IUIPayload payload);
-        void Hide();
+        void Hide(Action onComplete = null);
         void Discard();
     }
 }

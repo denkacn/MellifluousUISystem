@@ -36,7 +36,7 @@ namespace MellifluousUI.Core.Presenters
             ShowEventHandler?.Invoke();
         }
 
-        public void Hide()
+        public void Hide(Action onComplete = null)
         {
             OnHideStarted();
             
@@ -44,6 +44,8 @@ namespace MellifluousUI.Core.Presenters
             {
                 OnHideEnded();
                 Dispose();
+                
+                onComplete?.Invoke();
             });
             
             HideEventHandler?.Invoke(_view.ViewId);

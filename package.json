@@ -1,7 +1,7 @@
 {
   "name": "com.puzikgames.mellifluousui",
   "displayName": "Mellifluous UI System",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "unity": "2021.1",
   "author": "Denis Puzik",
   "description": "UI System for Unity",
