@@ -39,16 +39,19 @@ namespace MellifluousUI.Core.Presenters
         public void Hide(Action onComplete = null)
         {
             OnHideStarted();
-            
-            _view.Hide(() =>
+
+            if (_view != null)
             {
-                OnHideEnded();
-                Dispose();
+                _view.Hide(() =>
+                {
+                    OnHideEnded();
+                    Dispose();
                 
-                onComplete?.Invoke();
-            });
+                    onComplete?.Invoke();
+                });
             
-            HideEventHandler?.Invoke(_view.ViewId);
+                HideEventHandler?.Invoke(_view.ViewId);
+            }
         }
         
         public virtual void Dispose(){}
@@ -57,7 +60,8 @@ namespace MellifluousUI.Core.Presenters
 
         protected TView GetView<TView>() where TView : BaseUIView
         {
-            return _view as TView;
+            var v = _view as TView;
+            return v;
         }
         
         protected TData GetPayload<TData>() where TData : UIPayloadBase

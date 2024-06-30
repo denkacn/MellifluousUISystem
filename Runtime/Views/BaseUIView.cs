@@ -1,5 +1,6 @@
 using System;
 using MellifluousUI.Core.Models;
+using MellifluousUI.Core.Views;
 using UnityEngine;
 
 namespace MellifluousUI.Core.Views

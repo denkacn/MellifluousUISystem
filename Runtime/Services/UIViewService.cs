@@ -13,16 +13,12 @@ namespace MellifluousUI.Core.Services
     {
         private List<IUIPresenter<BaseUIView>> _presenters;
         private IUIViewComparator _comparator = new UIViewComparator();
-        
-        //private Stack<IUIPresenter<BaseUIView>> _opened;
-        //private IUIPresenter<BaseUIView> _current;
 
         private Dictionary<UIGroupType, IUIGroupWorker> _groupWorkers;
         
         public void Initialize()
         {
             _presenters = new List<IUIPresenter<BaseUIView>>();
-            //_opened = new Stack<IUIPresenter<BaseUIView>>();
             _groupWorkers = new Dictionary<UIGroupType, IUIGroupWorker>();
         }
         
@@ -38,6 +34,14 @@ namespace MellifluousUI.Core.Services
                 AddView(view);
             }
         }
+        
+        public void RemoveViews(IEnumerable<BaseUIView> views)
+        {
+            foreach (var view in views)
+            {
+                RemoveView(view);
+            }
+        }
 
         public void SetComparator(IUIViewComparator comparator)
         {
@@ -46,6 +50,8 @@ namespace MellifluousUI.Core.Services
         
         public void AddView(BaseUIView view)
         {
+            Debug.Log(view.ViewId);
+            
             var presenter = _comparator.CompareT(view);
             presenter.HideEventHandler += OnHideView;
             presenter.Init(view, this);
@@ -57,54 +63,30 @@ namespace MellifluousUI.Core.Services
             
             _groupWorkers[view.ViewId.GroupType].AddPresenter(presenter);
         }
+        
+        public void RemoveView(BaseUIView view)
+        {
+            var presenter = _presenters.Find(p => p.View.ViewId == view.ViewId);
+            
+            if (presenter != null)
+            {
+                presenter.Hide();
+                presenter.Discard();
+                presenter.HideEventHandler -= OnHideView;
+                
+                _presenters.Remove(presenter);
+                _groupWorkers[view.ViewId.GroupType].RemovePresenter(presenter);
+            }
+        }
 
         public void Show(ViewId viewId, UIPayloadBase payload = null, bool isHideAll = true)
         {
             _groupWorkers[viewId.GroupType].Show(viewId, payload, isHideAll);
-            
-            /*var presenter = _presenters.Find(v => v.View.ViewId.Id == viewId.Id);
-            if (presenter != null && !presenter.View.IsShowed)
-            {
-                presenter.Show(payload);
-                _current = presenter;
-            }
-            
-            _opened.Clear();*/
         }
-        
-        /*public void MoveForward(ViewId viewId, UIPayloadBase payload = null)
-        {
-            var presenter = _presenters.Find(v => v.View.ViewId.Id == viewId.Id);
-            if (presenter != null && !presenter.View.IsShowed)
-            {
-                presenter.Show(payload);
-                _opened.Push(presenter);
-                //_current = presenter;
-            }
-        }
-        
-        public void MoveBackward()
-        {
-            if (_opened.Count > 1)
-            {
-                var presenterToHide = _opened.Pop();
-                presenterToHide.Hide();
-                
-                var presenterToShow = _opened.Peek();
-                presenterToShow.Show(null);
-                //_current = presenterToShow;
-            }
-        }*/
 
         public void Hide(ViewId viewId)
         {
             _groupWorkers[viewId.GroupType].Hide(viewId);
-            
-            /*var presenter = _presenters.Find(v => v.View.ViewId.Id == viewId.Id);
-            if (presenter != null)
-            {
-                presenter.Hide();
-            }*/
         }
 
         public void Discard(ViewId viewId)
@@ -118,9 +100,6 @@ namespace MellifluousUI.Core.Services
             }
         }
         
-        private void OnHideView(ViewId viewId)
-        {
-            
-        }
+        private void OnHideView(ViewId viewId){}
     }
 }

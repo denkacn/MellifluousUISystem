@@ -10,5 +10,6 @@ namespace MellifluousUI.Core.GroupWorkers
         void Show(ViewId viewId, UIPayloadBase payload = null, bool isHideAll = false);
         void Hide(ViewId viewId);
         void AddPresenter(IUIPresenter<BaseUIView> presenter);
+        void RemovePresenter(IUIPresenter<BaseUIView> presenter);
     }
 }

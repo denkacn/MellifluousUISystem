@@ -25,6 +25,11 @@ namespace MellifluousUI.Core.GroupWorkers
         {
             _presenters.Add(presenter);
         }
+        
+        public void RemovePresenter(IUIPresenter<BaseUIView> presenter)
+        {
+            _presenters.Remove(presenter);
+        }
 
         public abstract void Show(ViewId viewId, UIPayloadBase payload = null, bool isHideAll = false);
         public abstract void Hide(ViewId viewId);
