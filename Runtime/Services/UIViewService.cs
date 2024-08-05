@@ -1,20 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MellifluousUI.Core.Comparators;
 using MellifluousUI.Core.GroupWorkers;
 using MellifluousUI.Core.Models;
 using MellifluousUI.Core.Payloads;
 using MellifluousUI.Core.Presenters;
 using MellifluousUI.Core.Views;
-using UnityEngine;
 
 namespace MellifluousUI.Core.Services
 {
-    public class UIViewService : IUIViewService 
+    public class UIViewService : IUIViewService
     {
+        public event Action<ViewId> ViewShowed;
+        public event Action<ViewId> ViewHided;
+
+        public List<ViewId> OpenedViews => new List<ViewId>(_openedViews);
+        
         private List<IUIPresenter<BaseUIView>> _presenters;
         private IUIViewComparator _comparator = new UIViewComparator();
 
         private Dictionary<UIGroupType, IUIGroupWorker> _groupWorkers;
+
+        private readonly List<ViewId> _openedViews = new List<ViewId>();
         
         public void Initialize()
         {
@@ -50,20 +57,21 @@ namespace MellifluousUI.Core.Services
         
         public void AddView(BaseUIView view)
         {
-            Debug.Log(view.ViewId);
+            //Debug.Log(view.ViewId);
             
             var presenter = _comparator.CompareT(view);
+            presenter.ShowEventHandler += OnShowView;
             presenter.HideEventHandler += OnHideView;
             presenter.Init(view, this);
                 
-            Debug.Log(presenter.GetType());
-            Debug.Log(presenter.View.GetType());
+            //Debug.Log(presenter.GetType());
+            //Debug.Log(presenter.View.GetType());
                 
             _presenters.Add(presenter);
             
             _groupWorkers[view.ViewId.GroupType].AddPresenter(presenter);
         }
-        
+
         public void RemoveView(BaseUIView view)
         {
             var presenter = _presenters.Find(p => p.View.ViewId == view.ViewId);
@@ -72,6 +80,7 @@ namespace MellifluousUI.Core.Services
             {
                 presenter.Hide();
                 presenter.Discard();
+                presenter.ShowEventHandler -= OnShowView;
                 presenter.HideEventHandler -= OnHideView;
                 
                 _presenters.Remove(presenter);
@@ -94,12 +103,25 @@ namespace MellifluousUI.Core.Services
             var presenter = _presenters.Find(v => v.View.ViewId.Id == viewId.Id);
             if (presenter != null)
             {
+                presenter.ShowEventHandler -= OnShowView;
                 presenter.HideEventHandler -= OnHideView;
                 presenter.Hide();
                 presenter.Discard();
             }
         }
-        
-        private void OnHideView(ViewId viewId){}
+
+        private void OnHideView(ViewId viewId)
+        {
+            _openedViews.RemoveAll(v=>v.Id == viewId.Id);
+            
+            ViewHided?.Invoke(viewId);
+        }
+
+        private void OnShowView(ViewId viewId)
+        {
+            _openedViews.Add(viewId);
+            
+            ViewShowed?.Invoke(viewId);
+        }
     }
 }

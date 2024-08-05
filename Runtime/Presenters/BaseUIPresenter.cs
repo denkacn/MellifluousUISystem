@@ -8,20 +8,23 @@ namespace MellifluousUI.Core.Presenters
 {
     public abstract class BaseUIPresenter<TView> : IUIPresenter<TView>, IDisposable where TView : BaseUIView
     {
-        public event Action ShowEventHandler;
+        public event Action<ViewId> ShowEventHandler;
         public event Action<ViewId> HideEventHandler;
         
         public TView View => GetView<TView>();
-        public ViewId ViewId => View.ViewId;
+        public ViewId ViewId => _viewId;//View.ViewId;
         
         protected IUIViewService ViewService;
         
         private BaseUIView _view;
         private IUIPayload _payload;
+        private ViewId _viewId;
 
         public void Init(BaseUIView view, IUIViewService viewService)
         {
             _view = view;
+            _viewId = _view.ViewId;
+            
             ViewService = viewService;
         }
 
@@ -33,7 +36,7 @@ namespace MellifluousUI.Core.Presenters
             
             _view.Show(OnShowEnded);
             
-            ShowEventHandler?.Invoke();
+            ShowEventHandler?.Invoke(_viewId);
         }
 
         public void Hide(Action onComplete = null)
@@ -49,9 +52,9 @@ namespace MellifluousUI.Core.Presenters
                 
                     onComplete?.Invoke();
                 });
-            
-                HideEventHandler?.Invoke(_view.ViewId);
             }
+            
+            HideEventHandler?.Invoke(_viewId);
         }
         
         public virtual void Dispose(){}

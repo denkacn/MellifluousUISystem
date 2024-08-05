@@ -8,7 +8,7 @@ namespace MellifluousUI.Core.Presenters
 {
     public interface IUIPresenter <out TView>
     {
-        event Action ShowEventHandler;
+        event Action<ViewId> ShowEventHandler;
         event Action<ViewId> HideEventHandler;
         
         TView View { get; }

@@ -25,7 +25,8 @@ namespace MellifluousUI.Core.Managers
                 DontDestroyOnLoad(this.gameObject);
 
                 SceneManager.sceneLoaded += OnSceneLoaded;
-
+                SceneManager.sceneUnloaded += OnSceneUnloaded;
+                
                 IUIViewComparator viewComparator = new UIViewComparator();
 
                 _viewService = new UIViewService();
@@ -34,12 +35,20 @@ namespace MellifluousUI.Core.Managers
                 _viewService.Initialize();
                 _viewService.SetComparator(viewComparator);
                 _viewService.AddGroupWorker(UIGroupType.Screen, new SimpleUIViewGroupWorker(UIGroupType.Screen));
+
+                _viewService.ViewHided += viewId => { Debug.Log("ViewHided: " + viewId.Name); };
+                _viewService.ViewShowed += viewId => { Debug.Log("ViewShowed: " + viewId.Name); };
             }
+        }
+
+        private void OnSceneUnloaded(Scene scene)
+        {
+            _viewsController.RemoveViews(scene.name);
         }
 
         public void StartUnloadingScenes()
         {
-            _viewsController.RemoveViews(SceneManager.GetActiveScene().name);
+            //_viewsController.RemoveViews(SceneManager.GetActiveScene().name);
         }
         
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -56,6 +65,8 @@ namespace MellifluousUI.Core.Managers
                     _viewService.Show(hasDisplayingView.View.ViewId, isHideAll: false);
                 }
             }
+            
+            //Debug.Log("OpenedView: " + _viewService.OpenedView[0].Name);
         }
     }
 }

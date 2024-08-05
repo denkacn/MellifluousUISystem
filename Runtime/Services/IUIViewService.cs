@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MellifluousUI.Core.Comparators;
 using MellifluousUI.Core.GroupWorkers;
 using MellifluousUI.Core.Models;
@@ -9,6 +10,11 @@ namespace MellifluousUI.Core.Services
 {
     public interface IUIViewService
     {
+        event Action<ViewId> ViewShowed;
+        event Action<ViewId> ViewHided;
+        
+        List<ViewId> OpenedViews { get; }
+        
         void Initialize();
         void SetComparator(IUIViewComparator comparator);
         void AddGroupWorker(UIGroupType groupType, IUIGroupWorker groupWorker);

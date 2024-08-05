@@ -17,6 +17,7 @@ namespace MellifluousUI.Core.GroupWorkers
         protected BaseUIViewGroupWorker(UIGroupType groupType)
         {
             GroupType = groupType;
+            
             _presenters = new List<IUIPresenter<BaseUIView>>();
             _showedPresenters = new List<IUIPresenter<BaseUIView>>();
         }
