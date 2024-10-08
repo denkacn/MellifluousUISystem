@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MellifluousUI.Core.Comparators;
 using MellifluousUI.Core.GroupWorkers;
 using MellifluousUI.Core.Models;
 using MellifluousUI.Core.Payloads;
 using MellifluousUI.Core.Presenters;
 using MellifluousUI.Core.Views;
+using MellifluousUI.Runtime.Loaders;
 
 namespace MellifluousUI.Core.Services
 {
@@ -17,11 +19,14 @@ namespace MellifluousUI.Core.Services
         public List<ViewId> OpenedViews => new List<ViewId>(_openedViews);
         
         private List<IUIPresenter<BaseUIView>> _presenters;
+        
         private IUIViewComparator _comparator = new UIViewComparator();
+        private IUIViewRuntimeLoader _viewRuntimeLoader;
 
         private Dictionary<UIGroupType, IUIGroupWorker> _groupWorkers;
 
         private readonly List<ViewId> _openedViews = new List<ViewId>();
+        private readonly List<BaseUIView> _runtimeLoadedViews = new List<BaseUIView>();
         
         public void Initialize()
         {
@@ -55,17 +60,17 @@ namespace MellifluousUI.Core.Services
             _comparator = comparator;
         }
         
+        public void SetRuntimeLoader(IUIViewRuntimeLoader loader)
+        {
+            _viewRuntimeLoader = loader;
+        }
+        
         public void AddView(BaseUIView view)
         {
-            //Debug.Log(view.ViewId);
-            
             var presenter = _comparator.CompareT(view);
             presenter.ShowEventHandler += OnShowView;
             presenter.HideEventHandler += OnHideView;
             presenter.Init(view, this);
-                
-            //Debug.Log(presenter.GetType());
-            //Debug.Log(presenter.View.GetType());
                 
             _presenters.Add(presenter);
             
@@ -88,9 +93,22 @@ namespace MellifluousUI.Core.Services
             }
         }
 
+        public void RemoveRuntimeLoaded()
+        {
+            foreach (var view in _runtimeLoadedViews)
+            {
+                RemoveView(view);
+            }
+            
+            _runtimeLoadedViews.Clear();
+        }
+
         public void Show(ViewId viewId, UIPayloadBase payload = null, bool isHideAll = true)
         {
-            _groupWorkers[viewId.GroupType].Show(viewId, payload, isHideAll);
+            if (_groupWorkers[viewId.GroupType].IsCanShow(viewId))
+                _groupWorkers[viewId.GroupType].Show(viewId, payload, isHideAll);
+            else
+                _ = TryLoadView(viewId, payload, isHideAll);
         }
 
         public void Hide(ViewId viewId)
@@ -108,6 +126,25 @@ namespace MellifluousUI.Core.Services
                 presenter.Hide();
                 presenter.Discard();
             }
+        }
+        
+        private async Task<BaseUIView> TryLoadView(ViewId viewId, UIPayloadBase payload, bool isHideAll)
+        {
+            if (_viewRuntimeLoader != null)
+            {
+                var view = await _viewRuntimeLoader.Load(viewId);
+
+                if (view != null)
+                {
+                    AddView(view);
+                    
+                    _runtimeLoadedViews.Add(view);
+                    
+                    _groupWorkers[viewId.GroupType].Show(viewId, payload, isHideAll);
+                }
+            }
+
+            return null;
         }
 
         private void OnHideView(ViewId viewId)

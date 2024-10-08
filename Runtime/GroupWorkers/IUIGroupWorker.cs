@@ -11,5 +11,6 @@ namespace MellifluousUI.Core.GroupWorkers
         void Hide(ViewId viewId);
         void AddPresenter(IUIPresenter<BaseUIView> presenter);
         void RemovePresenter(IUIPresenter<BaseUIView> presenter);
+        bool IsCanShow(ViewId viewId);
     }
 }

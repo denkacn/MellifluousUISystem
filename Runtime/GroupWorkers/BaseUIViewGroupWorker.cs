@@ -32,6 +32,11 @@ namespace MellifluousUI.Core.GroupWorkers
             _presenters.Remove(presenter);
         }
 
+        public bool IsCanShow(ViewId viewId)
+        {
+            return _presenters.Find(v => v.View.ViewId.Id == viewId.Id) != null;
+        }
+
         public abstract void Show(ViewId viewId, UIPayloadBase payload = null, bool isHideAll = false);
         public abstract void Hide(ViewId viewId);
     }
