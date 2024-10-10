@@ -3,9 +3,9 @@ using MellifluousUI.Core.Attributes;
 using MellifluousUI.Core.Presenters;
 using MellifluousUI.Core.Views;
 
-namespace MellifluousUI.Core.Comparators
+namespace MellifluousUI.Core.Resolvers
 {
-    public class UIViewComparator : IUIViewComparator
+    public class UIViewResolver : IUIViewResolver
     {
         public IUIPresenter<BaseUIView> CompareT(BaseUIView item)
         {

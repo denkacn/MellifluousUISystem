@@ -1,8 +1,8 @@
-using MellifluousUI.Core.Comparators;
 using MellifluousUI.Core.GroupWorkers;
 using MellifluousUI.Core.Services;
 using MellifluousUI.Core.Controllers;
 using MellifluousUI.Core.Providers;
+using MellifluousUI.Core.Resolvers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,7 +27,7 @@ namespace MellifluousUI.Core.Managers
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 SceneManager.sceneUnloaded += OnSceneUnloaded;
                 
-                IUIViewComparator viewComparator = new UIViewComparator();
+                IUIViewResolver viewComparator = new UIViewResolver();
 
                 _viewService = new UIViewService();
                 _viewsController = new SimpleUIViewsController(_viewService);

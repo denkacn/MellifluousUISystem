@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using MellifluousUI.Core.Comparators;
 using MellifluousUI.Core.GroupWorkers;
 using MellifluousUI.Core.Models;
 using MellifluousUI.Core.Payloads;
+using MellifluousUI.Core.Resolvers;
 using MellifluousUI.Core.Views;
 using MellifluousUI.Runtime.Loaders;
 
@@ -17,7 +17,7 @@ namespace MellifluousUI.Core.Services
         List<ViewId> OpenedViews { get; }
         
         void Initialize();
-        void SetComparator(IUIViewComparator comparator);
+        void SetComparator(IUIViewResolver comparator);
         void SetRuntimeLoader(IUIViewRuntimeLoader loader);
         
         void AddGroupWorker(UIGroupType groupType, IUIGroupWorker groupWorker);

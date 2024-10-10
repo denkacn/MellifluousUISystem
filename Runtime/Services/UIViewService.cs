@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MellifluousUI.Core.Comparators;
 using MellifluousUI.Core.GroupWorkers;
 using MellifluousUI.Core.Models;
 using MellifluousUI.Core.Payloads;
 using MellifluousUI.Core.Presenters;
+using MellifluousUI.Core.Resolvers;
 using MellifluousUI.Core.Views;
 using MellifluousUI.Runtime.Loaders;
 
@@ -20,7 +20,7 @@ namespace MellifluousUI.Core.Services
         
         private List<IUIPresenter<BaseUIView>> _presenters;
         
-        private IUIViewComparator _comparator = new UIViewComparator();
+        private IUIViewResolver _comparator = new UIViewResolver();
         private IUIViewRuntimeLoader _viewRuntimeLoader;
 
         private Dictionary<UIGroupType, IUIGroupWorker> _groupWorkers;
@@ -55,7 +55,7 @@ namespace MellifluousUI.Core.Services
             }
         }
 
-        public void SetComparator(IUIViewComparator comparator)
+        public void SetComparator(IUIViewResolver comparator)
         {
             _comparator = comparator;
         }
